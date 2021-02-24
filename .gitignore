@@ -1,2 +1,6 @@
-venv*
+*venv
 .vscode*
+credential.yaml
+__pycache__/
+*.py[cod]
+*$py.class
