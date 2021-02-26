@@ -48,12 +48,12 @@ if __name__=='__main__':
     #search_geocity('Seattle',{'Authorization':f"Bearer {search_args['bearer_token']}"})
     rule = search_rules("COVID",filters="lang:en place:Seattle",fromdate="2019-06-09",todate="2020-06-10")
     #print(rule)
-    cities = [['New York',[40.730610,-73.935242,100]],['Seattle',[47.608013,-122.335167,100]],
-              ['Hawaii',[19.741755,-155.844437,100]],['Miami',[25.761681,-80.191788,100]],['London',[51.509865,-0.118092,100]]
-          ,['Mumbai',[19.076090,72.877426,100]], ['Delhi',[28.644800,77.216721,100]],['Seoul',[37.532600,127.024612,100]]
-          ,['Singapore',[1.290270,103.851959,100]], ['Tokyo',[35.652832,139.839478,100]]
-          ,['Rome',[41.902782,12.496366,100]],['Auckland',[-36.848461,174.763336,100]],['Syndey',[-33.865143,151.209900,100]],
-          ['Cape Town',[-33.918861,18.423300,100]],['Manaus-Brazil',[-3.117034,-60.025780,100]]
+    cities = [['New York',[40.730610,-73.935242,25]],['Seattle',[47.608013,-122.335167,25]],
+              ['Hawaii',[19.741755,-155.844437,25]],['Miami',[25.761681,-80.191788,25]],['London',[51.509865,-0.118092,25]]
+          ,['Mumbai',[19.076090,72.877426,25]], ['Delhi',[28.644800,77.216721,25]],['Seoul',[37.532600,127.024612,25]]
+          ,['Singapore',[1.290270,103.851959,25]], ['Tokyo',[35.652832,139.839478,25]]
+          ,['Rome',[41.902782,12.496366,25]],['Auckland',[-36.848461,174.763336,25]],['Syndey',[-33.865143,151.209900,25]],
+          ['Cape Town',[-33.918861,18.423300,25]],['Manaus-Brazil',[-3.117034,-60.025780,25]]
           ]
             #'London','Hawaii','Miami','Mumbai','Delhi','Seoul','Singapore','Tokyo','Rome','Auckland','Syndey','Cape Town']
     # covid_keywords = ['Coronavirus']
@@ -61,7 +61,7 @@ if __name__=='__main__':
     covid_search_term = "Asymptomatic OR Coronavirus OR (Community spread) OR Ventilator OR PPE (Social distancing) OR (Self isolation) OR (Self quarantine) OR (Shelter in place) OR mask OR N95 OR (Herd immunity) OR Vaccine OR COVID"
     mental_search_term = "(mental health) OR depression OR stress OR addiction OR alcoholism OR anxiety OR (health anxiety) OR lonely OR ptsd OR schizophrenia OR (social anxiety) OR suicide OR meditation OR therapy OR counsel OR emotion OR crazy"
     keywords = {'covid_search':covid_search_term,'mental_search': mental_search_term}
-    START_DATE = "2019-12-01"
+    START_DATE = "2020-01-01"
     default_place={'place_id':0}
     for i in range(0,31,1):
         datetime_object = datetime.strptime(START_DATE, '%Y-%m-%d')
