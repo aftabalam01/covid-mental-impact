@@ -15,7 +15,8 @@ def search_rules(q, filters=None, fromdate=None, todate=None, results_per_call=5
         query = q
         if filters:
             query = q + ' ' + filters
-        rule = gen_request_parameters(query= query, start_time=fromdate, end_time=todate, results_per_call = results_per_call,
+        rule = gen_request_parameters(query= query, start_time=fromdate, end_time=todate, expansions="geo.place_id,author_id",
+                                        results_per_call = results_per_call,
                                         user_fields="id,location,verified",place_fields="place_type,name,country_code",
                                         tweet_fields="id,created_at,text,in_reply_to_user_id,lang,geo,author_id,possibly_sensitive,public_metrics") 
         #{"tweet.fields":[attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,non_public_metrics,organic_metrics,possibly_sensitive,promoted_metrics,public_metrics,referenced_tweets,reply_settings,source,text,withheld]"}]
@@ -46,7 +47,7 @@ if __name__=='__main__':
     
     search_args = credential_args(filename="./credential.yaml",yaml_key="search_tweets_premium")
     #search_geocity('Seattle',{'Authorization':f"Bearer {search_args['bearer_token']}"})
-    rule = search_rules("COVID",filters="lang:en place:Seattle",fromdate="2019-06-09",todate="2020-06-10")
+    #rule = search_rules("COVID",filters="lang:en place:Seattle",fromdate="2019-06-09",todate="2020-06-10")
     #print(rule)
     cities = [['New York',[40.730610,-73.935242,25]],['Seattle',[47.608013,-122.335167,25]],
               ['Hawaii',[19.741755,-155.844437,25]],['Miami',[25.761681,-80.191788,25]],['London',[51.509865,-0.118092,25]]
@@ -61,44 +62,46 @@ if __name__=='__main__':
     covid_search_term = "Asymptomatic OR Coronavirus OR (Community spread) OR Ventilator OR PPE (Social distancing) OR (Self isolation) OR (Self quarantine) OR (Shelter in place) OR mask OR N95 OR (Herd immunity) OR Vaccine OR COVID"
     mental_search_term = "(mental health) OR depression OR stress OR addiction OR alcoholism OR anxiety OR (health anxiety) OR lonely OR ptsd OR schizophrenia OR (social anxiety) OR suicide OR meditation OR therapy OR counsel OR emotion OR crazy"
     keywords = {'covid_search':covid_search_term,'mental_search': mental_search_term}
-    START_DATE = "2020-01-01"
-    default_place={'place_id':0}
-    for i in range(0,31,1):
-        datetime_object = datetime.strptime(START_DATE, '%Y-%m-%d')
-        query_start_date = datetime_object+ timedelta(i)
-        query_end_date = datetime_object+ timedelta(i+1)
-        print(f"Quering for start date {query_start_date} and end date {query_end_date}")
-        for query, value in keywords.items():
-            for city, radius in cities:
-                #point_radius:[longitude latitude radius]
-                rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
-                                    ,fromdate=query_start_date.strftime('%Y-%m-%d')
-                                    ,todate=query_end_date.strftime('%Y-%m-%d'))
-                print(f"Query Rule {rule}")
-                tweets = fetch_results(rule,search_args,MAX_TWEETS)
-                for tweet in tweets:
-                    if 'users' in tweet.keys():
-                        for user in tweet['users']:
-                            with open('tweets_users.csv','a') as place_f:
-                                user_f.write(f"{user.get('author_id')}|{user.get('id')}|{user.get('location')}|{user.get('verified')}\n")
-                        continue
+    dates = ["2020-04-01","2020-07-01","2020-10-01","2021-01-01"]
+    for START_DATE in dates:
+        default_place={'place_id':0}
+        for i in range(0,31,1):
+            datetime_object = datetime.strptime(START_DATE, '%Y-%m-%d')
+            query_start_date = datetime_object+ timedelta(i)
+            query_end_date = datetime_object+ timedelta(i+1)
+            print(f"Quering for start date {query_start_date} and end date {query_end_date}")
+            for query, value in keywords.items():
+                for city, radius in cities:
+                    #point_radius:[longitude latitude radius]
+                    rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
+                                        ,fromdate=query_start_date.strftime('%Y-%m-%d')
+                                        ,todate=query_end_date.strftime('%Y-%m-%d'))
+                    #print(f"Query Rule {rule}")
+                    tweets = fetch_results(rule,search_args,MAX_TWEETS)
+                    for tweet in tweets:
 
-                    if 'places' in tweet.keys():
-                        for place in tweet['places']:
-                            with open('tweets_place.csv','a') as user_f:
-                                place_f.write(f"{place.get('id')}|{place.get('place_type')}|{place.get('name')}|{place.get('country_code')}\n")
-                        continue
-                    if tweet.get('text'):
-                        text = tweet.get('text').replace('\n', ' ').replace('\r', '')
-                        with open('tweets_response.csv','a') as tweet_f:
-                            tweet_f.write(f"{tweet.get('id')}|{tweet.get('created_at')}|{tweet.get('author_id')}| \
-                            {text}|{tweet.get('lang')}|{tweet.get('geo',default_place)['place_id']}|\
-                            {tweet.get('in_reply_to_user_id')}| \
-                            {tweet.get('possibly_sensitive')}| \
-                            {tweet.get('public_metrics',{'retweet_count':0})['retweet_count']}| \
-                            {tweet.get('public_metrics',{'reply_count':0})['reply_count']}| \
-                            {tweet.get('public_metrics',{'like_count':0})['like_count']}| \
-                            {tweet['public_metrics']['quote_count']}|{query}|{city}\n")
+                        if 'users' in tweet.keys():
+                            for user in tweet['users']:
+                                with open('tweets_users.csv','a') as user_f:
+                                    user_f.write(f"{user.get('author_id')}|{user.get('id')}|{user.get('location')}|{user.get('verified')}\n")
+                            continue
+
+                        if 'places' in tweet.keys():
+                            for place in tweet['places']:
+                                with open('tweets_place.csv','a') as place_f:
+                                    place_f.write(f"{place.get('id')}|{place.get('place_type')}|{place.get('name')}|{place.get('country_code')}\n")
+                            continue
+                        if tweet.get('text'):
+                            text = tweet.get('text').replace('\n', ' ').replace('\r', '')
+                            with open('tweets_response.csv','a') as tweet_f:
+                                tweet_f.write(f"{tweet.get('id')}|{tweet.get('created_at')}|{tweet.get('author_id')}| \
+                                {text}|{tweet.get('lang')}|{tweet.get('geo',default_place)['place_id']}|\
+                                {tweet.get('in_reply_to_user_id')}| \
+                                {tweet.get('possibly_sensitive')}| \
+                                {tweet.get('public_metrics',{'retweet_count':0})['retweet_count']}| \
+                                {tweet.get('public_metrics',{'reply_count':0})['reply_count']}| \
+                                {tweet.get('public_metrics',{'like_count':0})['like_count']}| \
+                                {tweet['public_metrics']['quote_count']}|{query}|{city}\n")
 
 
 #sample tweets response 
