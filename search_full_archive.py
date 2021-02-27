@@ -37,7 +37,7 @@ def search_geocity(query,headers):
 
 if __name__=='__main__':
     START_OVER = False
-    MAX_TWEETS = 1000
+    MAX_TWEETS = 10000
     if START_OVER:
         with open('tweets_response.csv','w') as tweet_f:
             tweet_f.write('tweet_id|created_at|author_id|language|inreply_to|possibly_sensitive|retweet_count|reply_count|like_count|quote_count|search_type|search_city')
@@ -50,20 +50,18 @@ if __name__=='__main__':
     #search_geocity('Seattle',{'Authorization':f"Bearer {search_args['bearer_token']}"})
     #rule = search_rules("COVID",filters="lang:en place:Seattle",fromdate="2019-06-09",todate="2020-06-10")
     #print(rule)
-    cities = [['New York',[40.730610,-73.935242,25]],['Seattle',[47.608013,-122.335167,25]],
-              ['Hawaii',[19.741755,-155.844437,25]],['Miami',[25.761681,-80.191788,25]],['London',[51.509865,-0.118092,25]]
-          ,['Mumbai',[19.076090,72.877426,25]], ['Delhi',[28.644800,77.216721,25]],['Seoul',[37.532600,127.024612,25]]
-          ,['Singapore',[1.290270,103.851959,25]], ['Tokyo',[35.652832,139.839478,25]]
-          ,['Rome',[41.902782,12.496366,25]],['Auckland',[-36.848461,174.763336,25]],['Syndey',[-33.865143,151.209900,25]],
-          ['Cape Town',[-33.918861,18.423300,25]],['Manaus-Brazil',[-3.117034,-60.025780,25]]
-          ]
-            #'London','Hawaii','Miami','Mumbai','Delhi','Seoul','Singapore','Tokyo','Rome','Auckland','Syndey','Cape Town']
-    # covid_keywords = ['Coronavirus']
-    # mental_health_keywords= ['(mental health)']
+    # cities = [['New York',[40.730610,-73.935242,25]],['Seattle',[47.608013,-122.335167,25]],
+    #           ['Hawaii',[19.741755,-155.844437,25]],['Miami',[25.761681,-80.191788,25]],['London',[51.509865,-0.118092,25]]
+    #       ,['Mumbai',[19.076090,72.877426,25]], ['Delhi',[28.644800,77.216721,25]],['Seoul',[37.532600,127.024612,25]]
+    #       ,['Singapore',[1.290270,103.851959,25]], ['Tokyo',[35.652832,139.839478,25]]
+    #       ,['Rome',[41.902782,12.496366,25]],['Auckland',[-36.848461,174.763336,25]],['Syndey',[-33.865143,151.209900,25]],
+    #       ['Cape Town',[-33.918861,18.423300,25]],['Manaus-Brazil',[-3.117034,-60.025780,25]]
+    #       ]
+
     covid_search_term = "Asymptomatic OR Coronavirus OR (Community spread) OR Ventilator OR PPE (Social distancing) OR (Self isolation) OR (Self quarantine) OR (Shelter in place) OR mask OR N95 OR (Herd immunity) OR Vaccine OR COVID"
     mental_search_term = "(mental health) OR depression OR stress OR addiction OR alcoholism OR anxiety OR (health anxiety) OR lonely OR ptsd OR schizophrenia OR (social anxiety) OR suicide OR meditation OR therapy OR counsel OR emotion OR crazy"
     keywords = {'covid_search':covid_search_term,'mental_search': mental_search_term}
-    dates = ["2020-07-01","2020-10-01","2021-01-01"]
+    dates = ["2020-01-01","2020-04-01","2020-07-01","2020-10-01","2021-01-01"]
     error_tweets= {}
     error_id = 0
     for START_DATE in dates:
@@ -74,9 +72,9 @@ if __name__=='__main__':
             query_end_date = datetime_object+ timedelta(i+1)
             print(f"Quering for start date {query_start_date} and end date {query_end_date}")
             for query, value in keywords.items():
-                for city, radius in cities:
+               # for city, radius in cities:
                     #point_radius:[longitude latitude radius]
-                    rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
+                    rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply" #has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
                                         ,fromdate=query_start_date.strftime('%Y-%m-%d')
                                         ,todate=query_end_date.strftime('%Y-%m-%d'))
                     #print(f"Query Rule {rule}")
