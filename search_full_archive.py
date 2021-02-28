@@ -73,38 +73,38 @@ if __name__=='__main__':
             print(f"Quering for start date {query_start_date} and end date {query_end_date}")
             for query, value in keywords.items():
                # for city, radius in cities:
-                    #point_radius:[longitude latitude radius]
-                    rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply" #has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
-                                        ,fromdate=query_start_date.strftime('%Y-%m-%d')
-                                        ,todate=query_end_date.strftime('%Y-%m-%d'))
-                    #print(f"Query Rule {rule}")
-                    tweets = fetch_results(rule,search_args,MAX_TWEETS)
-                    for tweet in tweets:
-                        try:
-                            if 'users' in tweet.keys():
-                                for user in tweet['users']:
-                                    with open('tweets_users.csv','a') as user_f:
-                                        user_f.write(f"{user.get('author_id')}|{user.get('id')}|{user.get('location')}|{user.get('verified')}\n")
-                                continue
+                #point_radius:[longitude latitude radius]
+                rule = search_rules(value,filters=f"lang:en -is:retweet -is:reply" #has:geo (place:{city} OR point_radius:[{radius[1]} {radius[0]} {radius[2]}mi])"
+                                    ,fromdate=query_start_date.strftime('%Y-%m-%d')
+                                    ,todate=query_end_date.strftime('%Y-%m-%d'))
+                #print(f"Query Rule {rule}")
+                tweets = fetch_results(rule,search_args,MAX_TWEETS)
+                for tweet in tweets:
+                    try:
+                        # if 'users' in tweet.keys():
+                        #     for user in tweet['users']:
+                        #         with open('tweets_users.csv','a') as user_f:
+                        #             user_f.write(f"{user.get('author_id')}|{user.get('id')}|{user.get('location')}|{user.get('verified')}\n")
+                        #     continue
 
-                            if 'places' in tweet.keys():
-                                for place in tweet['places']:
-                                    with open('tweets_place.csv','a') as place_f:
-                                        place_f.write(f"{place.get('id')}|{place.get('place_type')}|{place.get('name')}|{place.get('country_code')}\n")
-                                continue
-                            if tweet.get('text'):
-                                text = tweet.get('text').replace('\n', ' ').replace('\r', '')
-                                with open('tweets_response.csv','a') as tweet_f:
-                                    tweet_f.write(f"{tweet.get('id')}|{tweet.get('created_at')}|{tweet.get('author_id')}| \
-                                    {text}|{tweet.get('lang')}|{tweet.get('geo',default_place)['place_id']}|\
-                                    {tweet.get('in_reply_to_user_id')}| \
-                                    {tweet.get('possibly_sensitive')}| \
-                                    {tweet.get('public_metrics',{'retweet_count':0})['retweet_count']}| \
-                                    {tweet.get('public_metrics',{'reply_count':0})['reply_count']}| \
-                                    {tweet.get('public_metrics',{'like_count':0})['like_count']}| \
-                                    {tweet['public_metrics']['quote_count']}|{query}|{city}\n")
-                        except: 
-                            error_tweets.update({error_id:tweet})
+                        # if 'places' in tweet.keys():
+                        #     for place in tweet['places']:
+                        #         with open('tweets_place.csv','a') as place_f:
+                        #             place_f.write(f"{place.get('id')}|{place.get('place_type')}|{place.get('name')}|{place.get('country_code')}\n")
+                        #     continue
+                        if tweet.get('text'):
+                            text = tweet.get('text').replace('\n', ' ').replace('\r', '')
+                            with open('tweets_response.csv','a') as tweet_f:
+                                tweet_f.write(f"{tweet.get('id')}|{tweet.get('created_at')}|{tweet.get('author_id')}| \
+                                {text}|{tweet.get('lang')}|{tweet.get('geo',default_place)['place_id']}|\
+                                {tweet.get('in_reply_to_user_id')}| \
+                                {tweet.get('possibly_sensitive')}| \
+                                {tweet.get('public_metrics',{'retweet_count':0})['retweet_count']}| \
+                                {tweet.get('public_metrics',{'reply_count':0})['reply_count']}| \
+                                {tweet.get('public_metrics',{'like_count':0})['like_count']}| \
+                                {tweet['public_metrics']['quote_count']}|{query}\n")
+                    except: 
+                        error_tweets.update({error_id:tweet})
     with open('error_tweets.json','w') as f :
         f.write(json.dumps(error_tweets))
 

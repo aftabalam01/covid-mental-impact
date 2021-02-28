@@ -1,2 +1,2 @@
 nltk
-#searchtweets
+searchtweets-v2==1.0.6
